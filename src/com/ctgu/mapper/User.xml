@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- User.xml具体映射文件对应的实体类接口 -->
+<mapper namespace="com.ctgu.dao.UserDao">
+	
+	<select id="findByName" parameterType="String" resultType="com.ctgu.pojo.User">
+		select * from friend_user where username=#{username}
+	</select>
+	
+    <select id="findById" parameterType="int" resultType="com.ctgu.pojo.User">
+    	select * from friend_user where id=#{id}
+    </select>
+    
+    <select id="findById2" parameterType="int" resultMap="myUser2">
+    	select * from friend_user where id=#{id}
+    </select>
+    
+    <insert id="register" parameterType="com.ctgu.pojo.User" useGeneratedKeys="true" keyProperty="id">
+    	insert into friend_user(username,password,name,age,gender,phone) 
+    	values (#{username},#{password},#{name},#{age},#{gender},#{phone})
+    </insert>
+    
+    <select id="login" parameterType="Map" resultType="com.ctgu.pojo.User">
+    	select * from friend_user where username=#{username} and password=#{password}
+    </select>
+    
+    <select id="findAll" resultMap="myUser">
+    	select * from friend_user limit #{0},#{1}
+    </select>
+    
+    <select id="getTotalCount" resultType="int">
+   		select count(*) from friend_user
+    </select>
+    
+    <!-- 嵌套查询 -->
+    <select id="findPicByUserId" parameterType="int" resultType="com.ctgu.pojo.Picture">
+    	select * from friend_pic where userId=#{userId}
+    </select>
+    
+    <!-- 结果map 防止列名不一致，一对一，一对多的情况 -->
+	<resultMap type="com.ctgu.pojo.User" id="myUser">
+    	<!-- column 是对应数据库中表的字段名称       property是对应的bean里面的属性名称 -->
+    	<id column="id" property="id"/>                <!-- 主键 -->
+    	<result column="username" property="username"/>
+    	<result column="password" property="password"/>
+    	<result column="name" property="name"/>
+    	<result column="age" property="age"/>
+    	<result column="gender" property="gender"/>
+    	<result column="phone" property="phone"/>
+    </resultMap>
+   
+    <delete id="deleteUser" parameterType="int">
+    	delete from friend_user where id=#{id}
+    </delete>
+    
+    <update id="updateUser" parameterType="com.ctgu.pojo.User">
+    	update friend_user set name=#{name},password=#{password},age=#{age},
+    	gender=#{gender},phone=#{phone} where id=#{id}
+    </update>
+    
+    <resultMap type="com.ctgu.pojo.User" id="myUser2">
+    	<!-- column 是对应数据库中表的字段名称       property是对应的bean里面的属性名称 -->
+    	<id column="id" property="id"/>                <!-- 主键 -->
+    	<result column="username" property="username"/>
+    	<result column="password" property="password"/>
+    	<result column="name" property="name"/>
+    	<result column="age" property="age"/>
+    	<result column="gender" property="gender"/>
+    	<result column="phone" property="phone"/>
+    	<!-- 一对多集合映射 -->
+    	<collection property="picList" column="id" ofType="com.ctgu.pojo.Picture" select="findPicByUserId">
+    	</collection>
+    </resultMap>
+    
+</mapper>
